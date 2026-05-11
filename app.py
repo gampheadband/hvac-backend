@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
+import os
 
 app = Flask(__name__)
-CORS(app) # Allows your website to talk to this script
+CORS(app) # This allows your website to talk to this script
 
-genai.configure(api_key="YOUR_FREE_GEMINI_KEY")
+# We will set this key in Render later for security
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = genai.GenerativeModel('gemini-pro')
 
 @app.route('/chat', methods=['POST'])
@@ -13,16 +15,15 @@ def chat():
     data = request.json
     user_input = data.get("message")
     
-    # Custom instruction to keep the AI focused on HVAC sales
     prompt = (
-        "You are a helpful HVAC dispatcher. Be professional and friendly. "
-        "Ask for the customer's name, phone number, and service address one by one. "
-        "If they provide all info, say 'Perfect! I've sent your details to our technician.'"
-        f"\nUser says: {user_input}"
+        "You are a professional HVAC dispatcher. Be helpful and brief. "
+        "Your goal is to get the customer's Name, Phone Number, and a description of their issue. "
+        "Ask only one question at a time. "
+        f"User says: {user_input}"
     )
     
     response = model.generate_content(prompt)
     return jsonify({"reply": response.text})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)
