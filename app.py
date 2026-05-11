@@ -8,7 +8,7 @@ CORS(app) # This allows your website to talk to this script
 
 # We will set this key in Render later for security
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 @app.route('/chat', methods=['POST'])
 def chat():
